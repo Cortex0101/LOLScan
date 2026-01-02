@@ -6,8 +6,10 @@ from pathlib import Path
 from typing import Generator, Tuple
 import numpy as np
 
-logger = logging.getLogger(__name__)
+# import config 
+import config as cfg
 
+logger = logging.getLogger(__name__)
 
 class VideoProcessor:
     """Handle video frame extraction and processing."""
@@ -21,6 +23,7 @@ class VideoProcessor:
             target_size: Resize frames to (width, height). If None, keep original size.
         """
         self.video_path = Path(video_path)
+        self.video_name = self.video_path.stem
         self.frame_skip = frame_skip
         self.target_size = target_size
         
@@ -63,6 +66,39 @@ class VideoProcessor:
             frame_count += 1
         
         self.cap.release()
+
+    def write_frame(self, frame, override: bool = False): 
+        """
+        Save the frame as an image in cfg.get('data.images_dir') with the video name and frame number.
+        Format is {video_name}_frame{frame_number:05d}.jpg
+        """
+        images_dir = Path(cfg.Config().get('data.images_dir', './data/images'))
+        images_dir.mkdir(parents=True, exist_ok=True)
+
+        labels_dir = Path(cfg.Config().get('data.labels_dir', './data/labels'))
+        labels_dir.mkdir(parents=True, exist_ok=True)
+
+        frame_number = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1
+        frame_filename = images_dir / f"{self.video_name}_frame{frame_number:05d}.jpg"
+        labels_filename = labels_dir / f"{self.video_name}_frame{frame_number:05d}.txt"
+
+        if frame_filename.exists() and not override:
+            logger.info(f"Frame {frame_number} already exists at {frame_filename}, skipping save.")
+            # throw exception
+            raise FileExistsError(f"Frame {frame_number} already exists at {frame_filename}")
+
+        cv2.imwrite(str(frame_filename), frame)
+        with open(labels_filename, 'w') as f:
+            f.write("")  # create empty label file
+        logger.info(f"Saved frame {frame_number} to {frame_filename}")
+
+    def process_all_frames(self):
+        """Process all frames in the video."""
+        for frame, frame_number in self.get_frames():
+            # Placeholder for processing logic
+            logger.debug(f"Processing frame {frame_number}")
+            # Example: Save the processed frame
+            self.write_frame(frame)
 
     def __enter__(self):
         return self
