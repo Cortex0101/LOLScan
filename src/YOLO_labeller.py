@@ -171,6 +171,9 @@ class YOLOLabeller:
             # Draw current box
             if self.current_box:
                 cv2.rectangle(frame, self.current_box[0], self.current_box[1], (255, 0, 0), 2)
+
+            # draw current class info
+            cv2.putText(frame, f"Class: {self.current_class} - {self.classes[self.current_class]}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             
             cv2.imshow("YOLO Labeller", frame)
             key = cv2.waitKey(1) & 0xFF
