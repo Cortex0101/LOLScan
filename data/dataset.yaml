@@ -1,0 +1,14 @@
+path: C:/dev/LOLScan/LOLScan/data
+train: images  # uses full images folder for now
+val: images    # consider adding images/val once you split
+
+# Classes
+nc: 6
+names: [
+            "champion",  # Default class
+            "enemy",
+            "ally",
+            "minion",
+            "turret",
+            "jungle_monster"
+        ]

@@ -23,6 +23,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 
+wandb/
+runs/
+
 # PyInstaller
 *.manifest
 *.spec
